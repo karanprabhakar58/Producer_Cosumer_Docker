@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+    Produce:
+        build: ./Producer
+        image: karanprabhakar58/producer:PR
+        container_name: producer_container
+        volumes: 
+            - share_persistent:/persistent_pro
+        #healthcheck:
+            #test: echo Karan Prabhakar || exit 1
+            #test: ["CMD", "./../Producer/HealthCheck.sh"] #checks whether file is created in volume or not
+            #interval: 2s
+        #command: ["--destpath", "/persistent/"]
+
+    Consume:
+        build: ./Consumer
+        image: karanprabhakar58/consumer:CR
+        container_name: consumer_container
+        volumes: 
+            - share_persistent:/persistent_con 
+        depends_on:
+            Produce:
+                condition: service_completed_successfully
+                # Check out URL to understand how service_healthy is used in conjuction with depends on
+                # https: //www.baeldung.com/linux/docker-compose-container-interdependence 
+                # Few More states like service_healthy
+                # https: //github.com/compose-spec/compose-spec/blob/master/spec.md#long-syntax-1
+                
+volumes:
+    share_persistent: 
